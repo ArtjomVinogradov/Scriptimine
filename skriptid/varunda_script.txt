@@ -1,0 +1,41 @@
+#!/bin/bash
+
+# Funktsioon varunda, et teha failide varukoopiad
+varunda() {
+  if [ $# -ne 1 ]; then
+    echo "Kasutus: varunda <faili_tee>"
+    return 1
+  fi
+
+  # Võtame faili tee argumendist
+  faili_tee="$1"
+
+  # Kontrollime, kas antud fail eksisteerib
+  if [ ! -e "$faili_tee" ]; then
+    echo "Hoiatus: Fail $faili_tee ei eksisteeri."
+    return 1
+  fi
+
+  # Loome kuupäeva ja kellaaja vormingu
+  kuupaev=$(date +"%Y-%m-%d")
+  kellaaeg=$(date +"%H-%M-%S")
+
+  # Eraldame faili nime ja selle laiendi
+  nimi=$(basename "$faili_tee")
+  laiend=$(echo "$nimi" | awk -F'.' '{print $NF}')
+
+  # Loome backup'i nime
+  backup_nimi="${nimi%.$laiend}_${kuupaev}_${kellaaeg}.$laiend"
+
+  # Loome backup'i kataloogi, kui seda pole juba olemas
+  backup_kataloog=$(dirname "$faili_tee")/backup
+  mkdir -p "$backup_kataloog"
+
+  # Tehakse backup
+  cp "$faili_tee" "$backup_kataloog/$backup_nimi"
+
+  echo "Backup loodud: $backup_kataloog/$backup_nimi"
+}
+
+# Kutsuge funktsiooni varunda, andes ette faili tee
+varunda "/home/administrator/skriptid/varunda_script.sh"

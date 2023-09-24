@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# Loome käsu, mis filtreerib /etc/passwd faili kasutajate järele
+users=$(grep -E '^[^:]+:[^:]+:[0-9]{1,5}:[0-9]{1,5}:[^:]+:[^:]+:[^:]+$' /etc/passwd)
+
+# Kuvame ainult kasutajad
+echo "$users"

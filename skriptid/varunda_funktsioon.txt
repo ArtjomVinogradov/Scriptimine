@@ -1,0 +1,34 @@
+#!/bin/bash
+
+# Funktsioon, mis kontrollib faili olemasolu
+kontrolli_faili_olemasolu() {
+  local faili_tee="$1"
+  if [ ! -e "$faili_tee" ]; then
+    echo "Hoiatus: Fail $faili_tee ei eksisteeri."
+    return 1
+  fi
+}
+
+# Funktsioon, mis loob backup'i
+varunda_faili() {
+  local faili_tee="$1"
+  local kuupaev=$(date +"%Y-%m-%d")
+  local kellaaeg=$(date +"%H-%M-%S")
+  local nimi=$(basename "$faili_tee")
+  local laiend=$(echo "$nimi" | awk -F'.' '{print $NF}')
+  local backup_nimi="${nimi%.$laiend}_${kuupaev}_${kellaaeg}.$laiend"
+  local backup_kataloog=$(dirname "$faili_tee")/backup
+
+  mkdir -p "$backup_kataloog"
+  cp "$faili_tee" "$backup_kataloog/$backup_nimi"
+
+  echo "Backup loodud: $backup_kataloog/$backup_nimi"
+}
+
+# Kasutame funktsiooni kontrolli_faili_olemasolu kontrollimaks faili olemasolu
+kontrolli_faili_olemasolu "/kodu/kasutaja/minufail.txt"
+
+# Kasutame funktsiooni varunda_faili, et teha varukoopia
+if [ $? -eq 0 ]; then
+  varunda_faili "/kodu/kasutaja/minufail.txt"
+fi
