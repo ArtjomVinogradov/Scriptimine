@@ -1,0 +1,67 @@
+#!/bin/bash
+
+# Funktsioon uuendab paketihalduri andmeid ja tarkvara
+update_packages() {
+    echo "Update & Upgrade"
+    sudo apt update
+    sudo apt upgrade -y
+    echo "Normalni vark, vse horosho"
+}
+
+# Funktsioon paigaldab Apache2 tarkvara ja käivitab selle
+install_apache2() {
+    if ! command -v apache2 &>/dev/null; then
+        echo "Paigaldame Apache2 tarkvara..."
+        sudo apt install apache2 -y
+        sudo systemctl start apache2
+        sudo systemctl enable apache2
+        echo "Apache2 tarkvara on edukalt paigaldatud."
+    else
+        echo "Apache2 tarkvara on juba olemas"
+    fi
+}
+
+# Funktsioon eemaldab Apache2 tarkvara
+remove_apache2() {
+    if command -v apache2 &>/dev/null; then
+        echo "Eemaldame Apache2 tarkvara..."
+        sudo systemctl stop apache2
+        sudo apt remove apache2 --purge -y
+        sudo apt autoremove -y
+        echo "Apache2 tarkvara on edukalt eemaldatud."
+    else
+        echo "Apache2 tarkvara pole paigaldatud."
+    fi
+}
+
+# Peamenüü
+while true; do
+    clear
+    echo "=== Menüü ==="
+    echo "1. Upgrade & Update"
+    echo "2. Paigalda Apache2 tarkvara"
+    echo "3. Eemalda Apache2 tarkvara"
+    echo "4. Välju"
+    read -p "Vali tegevus (1/2/3/4): " choice
+
+    case $choice in
+        1)
+            update_packages
+            ;;
+        2)
+            install_apache2
+            ;;
+        3)
+            remove_apache2
+            ;;
+        4)
+            echo "Väljume menüüst. Davai Fartu!"
+            exit 0
+            ;;
+        *)
+            echo "Vale valik! Palun vali olemasolev valik (1/2/3/4)."
+            ;;
+    esac
+
+    read -p "Vajuta Enter, et jätkata..."
+done
